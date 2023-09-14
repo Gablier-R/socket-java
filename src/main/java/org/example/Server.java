@@ -6,18 +6,32 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Server {
     static List<ClienteHandler> clientes = new ArrayList<>();
+    private static final Scanner serverInput = new Scanner(System.in);
 
     public static void main(String[] args) {
 
         try (ServerSocket serverSocket = new ServerSocket(9999)) {
             System.out.println("Servidor esperando conexões na porta " + 9999);
 
+            Thread serverInputThread = new Thread(() -> {
+                while (true) {
+                    String mensagemDoServidor = serverInput.nextLine();
+                    if (!mensagemDoServidor.isEmpty()) {
+                        enviarMensagemDoServidor(mensagemDoServidor);
+                    }
+                }
+            });
+            serverInputThread.start();
+
             while (true) {
                 Socket clienteSocket = serverSocket.accept();
-                System.out.println("Cliente conectado: " + clienteSocket.getInetAddress());
+
+                var time = LocalDateTime.now();
+                System.out.println( time + " Cliente conectado: " + clienteSocket.getInetAddress());
 
                 ClienteHandler clienteHandler = new ClienteHandler(clienteSocket);
                 clientes.add(clienteHandler);
@@ -30,16 +44,20 @@ public class Server {
     }
 
     public static void broadcast(String mensagem, ClienteHandler remetente) {
-        var  time = LocalDateTime.now();
         for (ClienteHandler cliente : clientes) {
             if (cliente != remetente) {
-                cliente.enviarMensagem(time + " Cliente " + remetente.getId() + ": " + mensagem);
+                String remetenteInfo = (remetente != null) ? " Cliente " + remetente.getId() : "";
+                cliente.enviarMensagem( remetenteInfo + ": " + mensagem);
             }
         }
     }
+
+    public static void enviarMensagemDoServidor(String mensagem) {
+        broadcast("Server: " + mensagem, null);
+    }
 }
 
-class ClienteHandler implements Runnable { //Alterar para extends, para manter padrão SOLID
+class ClienteHandler implements Runnable {
     private static int contador = 1;
     private Socket clienteSocket;
     private BufferedReader input;
