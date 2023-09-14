@@ -44,13 +44,13 @@ public class Server {
     }
 
     public static void broadcast(String mensagem, ClienteHandler remetente) {
+
         for (ClienteHandler cliente : clientes) {
-            if (cliente != remetente) {
-                String remetenteInfo = (remetente != null) ? " Cliente " + remetente.getId() : "";
-                cliente.enviarMensagem( remetenteInfo + ": " + mensagem);
-            }
+            String remetenteInfo = (remetente != null) ? " Cliente " + remetente.getId() : "";
+            cliente.enviarMensagem( remetenteInfo + ":" + mensagem);
         }
     }
+
 
     public static void enviarMensagemDoServidor(String mensagem) {
         broadcast("Server: " + mensagem, null);
@@ -59,10 +59,10 @@ public class Server {
 
 class ClienteHandler implements Runnable {
     private static int contador = 1;
-    private Socket clienteSocket;
+    private final Socket clienteSocket;
     private BufferedReader input;
     private PrintWriter output;
-    private int id;
+    private final int id;
 
     public ClienteHandler(Socket socket) {
         this.clienteSocket = socket;
@@ -85,10 +85,11 @@ class ClienteHandler implements Runnable {
 
     @Override
     public void run() {
+        var time = LocalDateTime.now();
         try {
             String mensagem;
             while ((mensagem = input.readLine()) != null) {
-                System.out.println("Cliente " + id + ": " + mensagem);
+                System.out.println( time + " Cliente " + id + ": " + mensagem);
                 Server.broadcast(mensagem, this);
             }
         } catch (IOException e) {
@@ -99,7 +100,8 @@ class ClienteHandler implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("Cliente " + id + " desconectado");
+
+            System.out.println(time + " Cliente " + id + " desconectado");
             Server.clientes.remove(this);
         }
     }
