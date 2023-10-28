@@ -14,4 +14,5 @@ This repository contains a Java project that uses sockets for communication betw
 ## How to use
 
 1. Clone the repository:
+   ```bash
    git clone https://github.com/Gablier-R/socket-java.git
