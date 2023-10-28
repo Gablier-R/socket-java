@@ -1,14 +1,15 @@
 # Java Socket
 
-This repository contains a Java project that uses sockets for communication between client and server. The application is aimed at [insert brief description of project purpose here].
+This repository contains a Java project that uses sockets for communication between client and server. The application is aimed at be a two-way chat between clients and servers. And as an addition, the socket server generates real-time chat between multiple clients.
 
 ## Functionalities
 
-- [List the main features of your project here]
+- Bidirectional communication between client and server
+- Communication interceptor between multiple clients.
 
 ## Requirements
 
-Make sure you have Java installed on your machine.
+- Java 8 or higher
 
 ## How to use
 
